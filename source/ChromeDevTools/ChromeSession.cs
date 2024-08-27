@@ -1,16 +1,16 @@
 ﻿#if !NETSTANDARD1_5
-using MasterDevs.ChromeDevTools.Serialization;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MasterDevs.ChromeDevTools.Serialization;
+using Newtonsoft.Json;
 using WebSocket4Net;
 
 namespace MasterDevs.ChromeDevTools
 {
-    public class ChromeSession : IChromeSession
+	public class ChromeSession : IChromeSession
     {
         private readonly string _endpoint;
         private readonly ConcurrentDictionary<string, ConcurrentBag<Action<object>>> _handlers = new ConcurrentDictionary<string, ConcurrentBag<Action<object>>>();
@@ -90,13 +90,20 @@ namespace MasterDevs.ChromeDevTools
 
         private Task<TDerived> CastTaskResult<TBase, TDerived>(Task<TBase> task) where TDerived: TBase
         {
-            var tcs = new TaskCompletionSource<TDerived>();
-            task.ContinueWith(t => tcs.SetResult((TDerived)t.Result),
-                TaskContinuationOptions.OnlyOnRanToCompletion);
-            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions),
-                TaskContinuationOptions.OnlyOnFaulted);
-            task.ContinueWith(t => tcs.SetCanceled(),
-                TaskContinuationOptions.OnlyOnCanceled);
+            var tcs             = new TaskCompletionSource<TDerived>();
+
+            task.ContinueWith(t =>
+            {
+                var err         = t.Result as ErrorResponse;
+
+                if (err==null)
+                    tcs.SetResult((TDerived)t.Result);
+                else
+                    tcs.SetException(new Exception(err.Error.Code+": "+err.Error.Message));
+
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(t => tcs.SetCanceled(),                             TaskContinuationOptions.OnlyOnCanceled);
             return tcs.Task;
         }
 
