@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MasterDevs.ChromeDevTools
 {
-    public class RemoteChromeProcess : IChromeProcess
+	public class RemoteChromeProcess : IChromeProcess
     {
         private readonly HttpClient http;
 
@@ -42,6 +42,11 @@ namespace MasterDevs.ChromeDevTools
         {
             string json = await http.GetStringAsync("/json/new");
             return JsonConvert.DeserializeObject<ChromeSessionInfo>(json);
+        }
+
+        public async Task EndSession(ChromeSessionInfo si)
+        {
+            string json         = await http.GetStringAsync("/json/close/"+si.Id);
         }
     }
 }
