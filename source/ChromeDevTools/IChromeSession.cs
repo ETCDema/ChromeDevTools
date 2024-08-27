@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 
 namespace MasterDevs.ChromeDevTools
 {
-    public interface ICommand<T>
-    {
+	public interface ICommand<T>
+	{
 
-    }
-    public interface IChromeSession
-    {
-        Task<CommandResponse<TResponse>> SendAsync<TResponse>(ICommand<TResponse> parameter, CancellationToken cancellationToken);
+	}
+	public interface IChromeSession
+	{
+		Task<CommandResponse<TResponse>> SendAsync<TResponse>(ICommand<TResponse> parameter, CancellationToken cancellationToken);
 
-        Task<ICommandResponse> SendAsync<T>(CancellationToken cancellationToken);
+		Task<ICommandResponse> SendAsync<T>(CancellationToken cancellationToken);
 
-        void Subscribe<T>(Action<T> handler) where T : class;
-    }
+		void Subscribe<T>(Action<T> handler) where T : class;
+
+		void SubscribeUnknown(Action<byte[]>? onUnknownData, Action<string>? onUnknownMessage);
+
+	}
 }
