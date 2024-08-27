@@ -1,22 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35201.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0D43D20B-6D51-4CBC-BD30-F17B8CA65678}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{9E670137-8739-4C9C-8693-797A230F38EB}"
 	ProjectSection(SolutionItems) = preProject
-		..\appveyor.yml = ..\appveyor.yml
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDevs.ChromeDevTools", "ChromeDevTools\MasterDevs.ChromeDevTools.csproj", "{C2508EE5-AAB2-4275-88C9-7DA9D1961336}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterDevs.ChromeDevTools", "ChromeDevTools\MasterDevs.ChromeDevTools.csproj", "{C2508EE5-AAB2-4275-88C9-7DA9D1961336}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterDevs.ChromeDevTools.ProtocolGenerator", "ProtocolGenerator\MasterDevs.ChromeDevTools.ProtocolGenerator.csproj", "{97C7FCF5-1964-4878-B7CD-63448CA403B1}"
 EndProject
@@ -55,5 +47,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1488AD1D-62EF-44E8-9188-0958DCEF36CF}
 	EndGlobalSection
 EndGlobal

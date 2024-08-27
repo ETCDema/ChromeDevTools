@@ -1,5 +1,3 @@
-[![NuGet version](https://badge.fury.io/nu/masterdevs.chromedevtools.svg)](http://badge.fury.io/nu/masterdevs.chromedevtools)
-
 # ChromeDevTools
 C# Library to interact with the Chrome Developer Tools.
 
@@ -65,7 +63,6 @@ If you didn't read the entire README (I don't blame you, I wouldn't), I've inclu
 ## Resources
 
   * [NuGet](https://www.nuget.org/packages/MasterDevs.ChromeDevTools/)
-  * Obligatory [blog post](http://blog.masterdevs.com/chrome-debugging-api/)
   * [Protocol Viewier](http://chromedevtools.github.io/debugger-protocol-viewer/)
   * Here's what the Chrome Team has to say about the Developer Tools protocol
     * [https://developer.chrome.com/devtools/docs/debugger-protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)
