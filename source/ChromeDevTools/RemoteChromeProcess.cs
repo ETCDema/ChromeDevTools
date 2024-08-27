@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -9,19 +10,20 @@ namespace MasterDevs.ChromeDevTools
     {
         private readonly HttpClient http;
 
-        public RemoteChromeProcess(string remoteDebuggingUri)
-            : this(new Uri(remoteDebuggingUri))
+        public RemoteChromeProcess(string remoteDebuggingUri, TimeSpan? timeout = null)
+            : this(new Uri(remoteDebuggingUri), timeout)
         {
 
         }
 
-        public RemoteChromeProcess(Uri remoteDebuggingUri)
+        public RemoteChromeProcess(Uri remoteDebuggingUri, TimeSpan? timeout = null)
         {
             RemoteDebuggingUri = remoteDebuggingUri;
 
-            http = new HttpClient
-            {
-                BaseAddress = RemoteDebuggingUri
+			http = new HttpClient
+			{
+				BaseAddress     = RemoteDebuggingUri,
+				Timeout         = timeout.HasValue ? timeout.Value : Timeout.InfiniteTimeSpan
             };
         }
 
