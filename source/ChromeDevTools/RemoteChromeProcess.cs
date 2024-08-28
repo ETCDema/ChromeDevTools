@@ -20,6 +20,8 @@ namespace MasterDevs.ChromeDevTools
 
 		private readonly object _sync	= new();
 		private readonly HttpClient http;
+		private bool _inited;
+		private ChromeVersionInfo? _versionInfo;
 		private NewSessionMethod _newSessionMethod      = NewSessionMethod.Auto;
 
 		public RemoteChromeProcess(string remoteDebuggingUri, TimeSpan? timeout = null, NewSessionMethod newSession = NewSessionMethod.Auto)
@@ -32,6 +34,7 @@ namespace MasterDevs.ChromeDevTools
 		{
 			RemoteDebuggingUri	= remoteDebuggingUri;
 			_newSessionMethod   = newSession;
+			_inited             = false;
 
 			http = new HttpClient
 			{
@@ -41,6 +44,8 @@ namespace MasterDevs.ChromeDevTools
 		}
 
 		public Uri RemoteDebuggingUri { get; }
+
+		public ChromeVersionInfo VersionInfo { get { _ensureInit(); return _versionInfo; } }
 
 		public virtual void Dispose()
 		{
@@ -55,14 +60,7 @@ namespace MasterDevs.ChromeDevTools
 
 		public async Task<ChromeSessionInfo> StartNewSession()
 		{
-			if (_newSessionMethod==NewSessionMethod.Auto)
-			{
-				lock (_sync)
-				{
-					if (_newSessionMethod==NewSessionMethod.Auto)
-						_newSessionMethod		= _detectNewSessionMethod().Result;
-				}
-			}
+			_ensureInit();
 
 			string json         = _newSessionMethod==NewSessionMethod.Get ? await http.GetStringAsync("/json/new")
 								: _newSessionMethod==NewSessionMethod.Put ? await PutAsyncAndGetString("/json/new", null)
@@ -70,11 +68,24 @@ namespace MasterDevs.ChromeDevTools
 			return JsonConvert.DeserializeObject<ChromeSessionInfo>(json);
 		}
 
-		private async Task<NewSessionMethod> _detectNewSessionMethod()
+		private void _ensureInit()
 		{
-			var json			= await http.GetStringAsync("/json/version");
-			var version			= new Regex("\"Browser\": \"[^\\/]+\\/(\\d+)").Match(json).Groups[1].Value;
-			return 111<=int.Parse(version) ? NewSessionMethod.Put : NewSessionMethod.Get;
+			if (_inited) return;
+			lock (_sync)
+			{
+				if (_inited) return;
+
+				var json        = http.GetStringAsync("/json/version").Result;
+				_versionInfo	= JsonConvert.DeserializeObject<ChromeVersionInfo>(json);
+
+				if (_newSessionMethod==NewSessionMethod.Auto)
+				{
+					var version = _versionInfo.Browser!=null ? new Regex("[^\\/]+\\/(\\d+)").Match(_versionInfo.Browser).Groups[1].Value : "-1";
+					_newSessionMethod	= 111<=int.Parse(version) ? NewSessionMethod.Put : NewSessionMethod.Get;
+				}
+
+				_inited         = true;
+			}
 		}
 
 		public async Task EndSession(ChromeSessionInfo si)
