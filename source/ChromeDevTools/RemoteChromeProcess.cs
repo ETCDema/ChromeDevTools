@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,17 +11,27 @@ namespace MasterDevs.ChromeDevTools
 {
 	public class RemoteChromeProcess : IChromeProcess
 	{
-		private readonly HttpClient http;
+		public enum NewSessionMethod
+		{
+			Auto				= -1,
+			Get					= 0,
+			Put					= 1,
+		}
 
-		public RemoteChromeProcess(string remoteDebuggingUri, TimeSpan? timeout = null)
-			: this(new Uri(remoteDebuggingUri), timeout)
+		private readonly object _sync	= new();
+		private readonly HttpClient http;
+		private NewSessionMethod _newSessionMethod      = NewSessionMethod.Auto;
+
+		public RemoteChromeProcess(string remoteDebuggingUri, TimeSpan? timeout = null, NewSessionMethod newSession = NewSessionMethod.Auto)
+			: this(new Uri(remoteDebuggingUri), timeout, newSession)
 		{
 
 		}
 
-		public RemoteChromeProcess(Uri remoteDebuggingUri, TimeSpan? timeout = null)
+		public RemoteChromeProcess(Uri remoteDebuggingUri, TimeSpan? timeout = null, NewSessionMethod newSession = NewSessionMethod.Auto)
 		{
-			RemoteDebuggingUri = remoteDebuggingUri;
+			RemoteDebuggingUri	= remoteDebuggingUri;
+			_newSessionMethod   = newSession;
 
 			http = new HttpClient
 			{
@@ -44,8 +55,26 @@ namespace MasterDevs.ChromeDevTools
 
 		public async Task<ChromeSessionInfo> StartNewSession()
 		{
-			string json         = await PutAsyncAndGetString("/json/new", null);
+			if (_newSessionMethod==NewSessionMethod.Auto)
+			{
+				lock (_sync)
+				{
+					if (_newSessionMethod==NewSessionMethod.Auto)
+						_newSessionMethod		= _detectNewSessionMethod().Result;
+				}
+			}
+
+			string json         = _newSessionMethod==NewSessionMethod.Get ? await http.GetStringAsync("/json/new")
+								: _newSessionMethod==NewSessionMethod.Put ? await PutAsyncAndGetString("/json/new", null)
+								: throw new NotSupportedException("NewSessionMethod="+_newSessionMethod);
 			return JsonConvert.DeserializeObject<ChromeSessionInfo>(json);
+		}
+
+		private async Task<NewSessionMethod> _detectNewSessionMethod()
+		{
+			var json			= await http.GetStringAsync("/json/version");
+			var version			= new Regex("\"Browser\": \"[^\\/]+\\/(\\d+)").Match(json).Groups[1].Value;
+			return 111<=int.Parse(version) ? NewSessionMethod.Put : NewSessionMethod.Get;
 		}
 
 		public async Task EndSession(ChromeSessionInfo si)
