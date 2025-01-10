@@ -21,7 +21,9 @@ namespace MasterDevs.ChromeDevTools
 		private readonly object _sync	= new();
 		private readonly HttpClient http;
 		private bool _inited;
+#pragma warning disable CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 		private ChromeVersionInfo? _versionInfo;
+#pragma warning restore CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 		private NewSessionMethod _newSessionMethod      = NewSessionMethod.Auto;
 
 		public RemoteChromeProcess(string remoteDebuggingUri, TimeSpan? timeout = null, NewSessionMethod newSession = NewSessionMethod.Auto)
@@ -93,7 +95,9 @@ namespace MasterDevs.ChromeDevTools
 			string json         = await http.GetStringAsync("/json/close/"+si.Id);
 		}
 
+#pragma warning disable CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 		private async Task<string> PutAsyncAndGetString(string url, HttpContent? content)
+#pragma warning restore CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 		{
 			var response		= await http.PutAsync(url, content).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();

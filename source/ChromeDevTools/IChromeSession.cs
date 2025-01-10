@@ -16,7 +16,9 @@ namespace MasterDevs.ChromeDevTools
 
 		void Subscribe<T>(Action<T> handler) where T : class;
 
+#pragma warning disable CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 		void SubscribeUnknown(Action<byte[]>? onUnknownData, Action<string>? onUnknownMessage);
+#pragma warning restore CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 
 	}
 }
